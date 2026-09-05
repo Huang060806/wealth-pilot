@@ -58,12 +58,20 @@ public class PlannerTools {
         AssetProfile p = store.profileOf(sessionId);
         PlanResult plan = financeService.generatePlan(p);
         store.savePlan(sessionId, plan);
+        StringBuilder assetText = new StringBuilder("逐资产分析：");
+        plan.getAssetLines().forEach(l -> assetText.append(String.format(
+                " %s 当前%.1f万→%d年后约%.1f万(年化%.1f%%)；",
+                l.getName(), l.getNow(),
+                p.getYears() != null ? p.getYears() : 10, l.getTerminal(), l.getAnnualReturn() * 100)));
         return String.format(
-                "规划已生成。当前净资产 %.2f 万元，月结余 %.0f 元，建议配置 %s。" +
-                "%d 年后：悲观 %.2f 万 / 中性 %.2f 万 / 乐观 %.2f 万。" +
+                "规划已生成。当前净资产 %.2f 万元，月结余 %.0f 元。当前配置 %s，建议配置 %s。" +
+                "%s" +
+                "%d 年后总量：悲观 %.2f 万 / 中性 %.2f 万 / 乐观 %.2f 万。" +
                 "蒙特卡洛 %d 次模拟：中位数 %.2f 万，10%%分位 %.2f 万，90%%分位 %.2f 万。" +
-                "（请告知用户可在页面查看完整曲线图）",
-                plan.getNetWorth(), plan.getMonthlySaving(), plan.getAllocation(),
+                "请向用户解释：每类资产按自己的真实收益率独立增长（不是一锅烩），页面右侧有逐资产明细和曲线图。",
+                plan.getNetWorth(), plan.getMonthlySaving(),
+                plan.getCurrentAllocation(), plan.getAllocation(),
+                assetText.toString(),
                 p.getYears() != null ? p.getYears() : 10,
                 plan.getPessimistic().get(plan.getPessimistic().size() - 1),
                 plan.getExpected().get(plan.getExpected().size() - 1),

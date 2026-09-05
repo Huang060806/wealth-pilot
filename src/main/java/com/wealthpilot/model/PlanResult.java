@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 规划结果：配置建议 + 三情景曲线 + 蒙特卡洛置信区间
+ * 规划结果：配置建议 + 逐资产分析 + 三情景曲线 + 蒙特卡洛置信区间
  */
 @Data
 @Builder
@@ -21,6 +21,12 @@ public class PlanResult {
     private List<Double> pessimistic;        // 悲观曲线（净资产，万元）
     private List<Double> expected;           // 中性曲线
     private List<Double> optimistic;         // 乐观曲线
+
+    /** 逐资产分析：现有每类资产按自身收益率滚动的结果 */
+    private List<AssetLine> assetLines;
+
+    /** 当前配置比例（对比建议配置） */
+    private Map<String, Double> currentAllocation;
 
     private double mcMedian;                 // 蒙特卡洛终值中位数
     private double mcP10;                    // 10% 分位（差）
