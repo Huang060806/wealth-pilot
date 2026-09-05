@@ -38,7 +38,7 @@ public class PlannerTools {
         if ((v = num(monthlyExpense)) != null) p.setMonthlyExpense(v);
         if ((v = num(age)) != null) p.setAge(v.intValue());
         if ((v = num(years)) != null && v > 0) p.setYears(v.intValue());
-        if (goal != null && !goal.isBlank()) p.setGoal(goal.trim());
+        if (goal != null && !goal.isBlank() && !goal.trim().matches("^[0-9.]+$")) p.setGoal(goal.trim());
         return "已记录。" + p.summary();
     }
 
