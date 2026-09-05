@@ -2,6 +2,7 @@ package com.wealthpilot.service;
 
 import com.wealthpilot.model.AssetProfile;
 import com.wealthpilot.model.PlanResult;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,16 +17,11 @@ import java.util.Random;
  * 确定性金融计算引擎：所有数字都在这里算，LLM 只负责理解和表达
  */
 @Service
+@RequiredArgsConstructor
 public class FinanceService {
 
     private final Random random = new Random();
-
-    /** 各资产类别的年化假设：{期望收益率, 波动率} */
-    private static final Map<String, double[]> ASSET_PARAMS = Map.of(
-            "股票", new double[]{0.07, 0.20},
-            "债券", new double[]{0.03, 0.05},
-            "现金", new double[]{0.015, 0.005}
-    );
+    private final MarketDataService marketDataService;
 
     /** 风险偏好 → 配置比例 */
     private static final Map<String, Map<String, Double>> ALLOCATIONS = Map.of(
@@ -42,7 +38,7 @@ public class FinanceService {
     private double[] portfolioParams(Map<String, Double> alloc) {
         double ret = 0, vol = 0;
         for (Map.Entry<String, Double> e : alloc.entrySet()) {
-            double[] p = ASSET_PARAMS.get(e.getKey());
+            double[] p = marketDataService.paramsOf(e.getKey());
             ret += p[0] * e.getValue();
             vol += p[1] * e.getValue();
         }
